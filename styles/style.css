@@ -13,7 +13,7 @@ html, body {
   padding: 30px;
   color: white;
   font-family: 'Courier New', Courier, monospace;
-  background-image: url("tile_background.jpg");
+  background-image: url("sunset_beach.jpg");
   text-align: center;
 }
 
@@ -47,7 +47,7 @@ html, body {
 }
 
 .navbutton.selected {
-  background-color: dodgerblue;
+  background-color: coral;
 }
 
 
@@ -87,13 +87,13 @@ html, body {
 }
 
 #content-wrap {
-  padding-bottom: 100px;    /* Footer height */
+  padding-bottom: 70px;    /* Footer height */
 }
 
 .footer{
   width: 100%;
-  height: 100px;
-  background-color:  dodgerblue;
+  height: 70px;
+  background-color:  coral;
   font-family: 'Courier New', Courier, monospace;
   position: absolute;
   bottom: 0;
@@ -102,7 +102,7 @@ html, body {
 
 .footer .message{
   text-align: center;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .footer .author{
@@ -146,12 +146,12 @@ html, body {
   margin: 5px 20px 20px 20px;
   padding: 10px 15px 10px 15px;
   font-size: 20px;
-  border-color:  dodgerblue;
-  color: dodgerblue;
+  border-color:  coral;
+  color: coral;
 }
 
 .content #create .postButton:hover{
-  background-color:  dodgerblue;
+  background-color:  coral;
   color: #fff;
 }
 
