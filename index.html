@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Lab 03 Fake WebApp</title>
+  <meta charset="UTF-8" />
+  <meta name="description" content="Unsourced but totally accurate (trust me!) news blog"/>
+  <meta name="author" content="Joel Pillar-Rogers" />
+  <meta name="keywords" content="html,forms,css,news,blog,facts" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/angularjs/1.7.8/angular.min.js"></script>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/angularjs/1.7.8/angular-route.js"></script>
+  <script type="text/javascript" src="scripts/app.js"></script>
+  <link rel="stylesheet" type="text/css" href="styles/style.css" />
+</head>
+
+
+
+<body ng-App="topApp" ng-controller="topController" >
+ 
+
+  <div class="header" ng-include="'views/title.html'">
+  </div>
+
+  <div class="navbar" ng-include="'views/navbar.html'" ng-controller="navbarController">
+  </div>
+
+  <div class="content" ng-view>
+  </div>
+     
+  <div class="footer" ng-include="'views/footer.html'" ng-controller="footerController">
+  </div>
+
+
+</body>
+
+</html>
+
+
+

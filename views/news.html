@@ -1,0 +1,10 @@
+<div id="news">
+    {{noNews}}
+    <div class="greyBox" ng-repeat="item in newsArray">
+        <h1>{{item.title}}</h1>
+        <p>{{item.content}}</p>  
+        <p class="postfooter">
+            <span class="left">{{item.author}}</span><span class="right">{{item.tags}}</span>
+        </p> 
+    </div>   
+</div>

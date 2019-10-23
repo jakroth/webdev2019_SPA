@@ -1,0 +1,16 @@
+<div id="create">
+    <p>Post Title</p>
+    <input type="text" name="posttitle" placeholder="Post Title" ng-model="title"/><br />
+    
+    <p>Author</p>
+    <input type="text" name="postauthor" placeholder="Author..." ng-model="author"/><br />
+    
+    <p>Current Time - {{dateTime}}</p>
+    <p>Content</p>
+    <textarea rows="20" cols="120" name="txtar" placeholder="Post content here..." ng-model="content" ></textarea><br />
+    
+    <p>Tags</p>
+    <input type="text" name="posttags" placeholder="Tags, separated by commas..." ng-model="tags"/><br />
+    
+    <button class="postButton" ng-click="postNews()">Post</button><br /><br />
+</div>

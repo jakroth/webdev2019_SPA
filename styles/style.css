@@ -1,0 +1,181 @@
+/*This is a css comment*/
+html, body {
+  margin: 0;
+  height: 100%;
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: antiquewhite;
+  display:flex;
+  flex-direction: column;
+}
+
+.headimage h1 {
+  margin: 0%;
+  padding: 30px;
+  color: white;
+  font-family: 'Courier New', Courier, monospace;
+  background-image: url("tile_background.jpg");
+  text-align: center;
+}
+
+
+
+/*Navbar*/
+.navbar {
+  overflow: hidden;
+  background-color: black;
+  padding: 20px, 30px;
+  width: 100%;
+}
+
+.navbar button{
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  float: left;
+  color: #f2f2f2;
+  background-color: black;
+  font-size: 18px;
+  border: none;
+  text-align: center;
+}
+
+.navbar button:hover{
+  color: #000;
+  background-color: #f2f2f2;
+}
+
+.navbutton.selected {
+  background-color: dodgerblue;
+}
+
+
+/*Pages*/
+.content{
+  flex: 1;
+  height: 100%;
+}
+
+.content #news{
+  width:80%;
+  margin: 15px 15px 15px 15px;
+}
+
+.content #about{
+  width:80%;
+  margin: 15px 15px 15px 15px;
+}
+  
+.content #login{
+  width:80%;
+  margin: 15px 15px 15px 15px;
+}
+
+.content #create {
+  background-color: rgba(255, 255, 255, 0.5);
+  position: relative;
+  width:80%;
+  margin: 15px 15px 15px 15px;
+
+}
+
+
+
+/*Footer*/
+.footer{
+  width: 100%;
+  height: 100px;
+  background-color:  dodgerblue;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.footer .message{
+  text-align: center;
+  font-size: 18px;
+}
+
+.footer .author{
+  text-align: center;
+  font-size: 10px;
+}
+
+
+
+/*Create*/
+.content #create p{
+  font-family: Arial, Helvetica, sans-serif;
+  font-size:18px;
+  font-weight: bold;
+  margin: 10px 10px 2px 10px;
+}
+
+.content #create input[type=text]{
+  font-family: Arial, Helvetica, sans-serif;
+  width:80%;
+  padding: 5px 5px 5px 5px;
+  margin: 0px 5px 5px 5px;
+}
+
+.content #create input[type=text]:focus{
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.content #create textarea{
+  font-family: Arial, Helvetica, sans-serif;
+  padding: 5px 5px 5px 5px;
+  margin: 0px 5px 5px 5px;
+}
+
+.content #create textarea:focus{
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.content #create .postButton{
+  background-color: rgba(255, 255, 255, 0.2);
+  margin: 5px 20px 20px 20px;
+  padding: 10px 15px 10px 15px;
+  font-size: 20px;
+  border-color:  dodgerblue;
+  color: dodgerblue;
+}
+
+.content #create .postButton:hover{
+  background-color:  dodgerblue;
+  color: #fff;
+}
+
+.content .greyBox{
+  background-color: #e6e6e6;
+  color:b#000;
+  width: 80%;
+  min-height: 200px;
+  position: relative;
+}
+
+.content .greyBox h1{
+  background-color: #ccc;
+  padding:10px 10px 10px 10px;
+}
+
+.content .greyBox p{
+  text-align: justify;
+    padding: 5px 5px 5px 5px;
+}
+
+.content .greyBox .postfooter {
+  background-color: #ccc;
+  position: absolute;
+  padding:0px 0px 0px 0px;
+  margin: 0%;
+  width: 100%;
+  bottom: 0;
+  left:0;
+}
+
+.right{
+  float:right;
+}
+
+.left{
+  float:left;
+}
