@@ -1,0 +1,14 @@
+<div id="faq">
+    <div class="greyBox">
+        <h1>{{faqHeader}}</h1>
+        
+        <div ng-repeat="item in faqArray">
+            <a href=#!/faq#{{$index}}>{{$index+1}}. {{item.title}}</a><br />
+        </div>        
+        
+        <div ng-repeat="item in faqArray">
+            <h2 id={{$index}}>{{$index+1}}. {{item.title}}</h2>
+            <p>{{item.content}}</p>  
+        </div>
+    </div>
+</div>

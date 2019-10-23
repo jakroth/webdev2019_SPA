@@ -11,12 +11,12 @@ var path = require('path');
 var bodyParser = require('body-parser')
 
 /*
-The "database" file. In a proper implementation this would not be used.
+The "database" files. In a proper implementation this would not be used.
 Note - require does NOT dynamically update. It calls once at the start of operation. Dynamic updates would
 require a new operation
 */
 var dn = require('./default_news.json');
-
+var faq = require('./faqs.json');
 
 /*
 Instance our express environment by calling its constructor and assinging to a variable
@@ -51,6 +51,15 @@ It returns the default_news.json contents to the request
 app.get("/getnews", function(req, res) {
     //getJSON
     res.send(dn);
+});
+
+/*
+Sets an AJAX GET route for the /getfaqs route. This is the route called by Angular when using the $http service in the url (e.g. localhost:3000/getfaqs)
+It returns the faqs.json contents to the request
+*/
+app.get("/getfaqs", function(req, res) {
+    //getJSON
+    res.send(faq);
 });
 
 
