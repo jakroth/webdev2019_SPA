@@ -73,28 +73,12 @@ app.listen(3000, function (){
 
 // **** AJAX and CRUD Server<->Database operations ********
 /*
-Sets an AJAX GET route for root operation. When root route is accessed the index.html page is served. This way our index would not need to be in the root location it just happens that in this instance it is.
+Sets an AJAX GET route for root operation. When root route is accessed the index.html page is served. 
+This way our index would not need to be in the root location it just happens that in this instance it is.
 Note that in an express environment routes control our server side access. Provided files can access resources to send that are included in the static declaration above
 */
 app.get("/", function(req, res) {
     res.sendFile("./index.html"); //index.html file of your angularjs application
-});
-
-
-/*
-Sets an AJAX GET route for the /getnews route. This is the route called by Angular when using the $http service in the url (e.g. localhost:3000/getnews)
-It connects to a MongoDB database and returns the whole news collections as a JSON array from the MongoDB database.
-This array is then passed back to the browser through the response function. 
-Code adapted from MongoDB website and https://www.thepolyglotdeveloper.com/2018/09/developing-restful-api-nodejs-mongodb-atlas/
-*/
-app.get("/getnews", function(req, res) { 
-    //read
-    collection.find({}).toArray(function(err, result) {
-        if(err) {
-            return response.status(500).send(error);
-        }
-        res.send(result);
-    });
 });
 
 
@@ -109,12 +93,31 @@ app.get("/getfaqs", function(req, res) {
 
 
 /*
+Sets an AJAX GET route for the /getnews route. This is the route called by Angular when using the $http service in the url (e.g. localhost:3000/getnews)
+It connects to a MongoDB database and READS the whole news collections as a JSON array from the MongoDB database.
+This array is then passed back to the browser through the response function. 
+Code adapted from MongoDB website and https://www.thepolyglotdeveloper.com/2018/09/developing-restful-api-nodejs-mongodb-atlas/
+There is currently no validation set up!!!
+*/
+app.get("/getnews", function(req, res) { 
+    //read
+    collection.find({}).toArray(function(err, result) {
+        if(err) {
+            return response.status(500).send(error);
+        }
+        res.send(result);
+    });
+});
+
+
+/*
 Sets an AJAX POST route for /writenews route. Called when an AJAX request is made by $http service in the url (e.g. localhost:3000/writenews). 
-It connects to a MongoDB database and inserts a news item.
+It connects to a MongoDB database and CREATES a news item.
 Code adapted from the MongoDB website and https://www.thepolyglotdeveloper.com/2018/09/developing-restful-api-nodejs-mongodb-atlas/
+There is currently no validation set up!!!
 */
 app.post("/writenews", function(req, res) {
-    //write
+    //create
    collection.insertOne(req.body, function(err, result){
         if(err) {
             return res.status(500).send(error);
@@ -126,18 +129,28 @@ app.post("/writenews", function(req, res) {
 });
 
 
-
-
+/*
+Sets an AJAX POST route for /writenews route. Called when an AJAX request is made by $http service in the url (e.g. localhost:3000/writenews). 
+It connects to a MongoDB database and DELETES a news item.
+Code adapted from the MongoDB website and https://www.thepolyglotdeveloper.com/2018/09/developing-restful-api-nodejs-mongodb-atlas/
+There is currently no validation set up!!!
+*/
+app.delete("/deletenews/", function(req, res) {
+    //delete
+   collection.deleteOne({ "_id": new ObjectId(req.body._id)}, function(err, result){
+        if(err) {
+            return res.status(500).send(error);
+        } 
+        res.send(result.result);
+    });
+});
 
 /*
-Method to take the POST data, add it to the json file and rewrite it.
-IMPORTANT: This is not a good way to store data, but is being used to avoid setting up database management. 
+I didn't create an Update function for news items due to time constraints. Would need a whole new editing page, probably similar to the create page. 
 */
 
-
-
 /*
-THIS METHOD IS NO LONGER USER - kept as an example for saving and retreiving from files
+THIS METHOD IS NO LONGER USED - kept as an example for saving and retreiving from server directory files
 Method to take the POST data, add it to the json file and rewrite it.
 IMPORTANT: This is not a good way to store data, but is being used to avoid setting up database management. 
 

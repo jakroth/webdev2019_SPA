@@ -51,6 +51,7 @@ html, body {
 }
 
 
+
 /*Pages*/
 .content{
   flex: 1;
@@ -78,6 +79,7 @@ html, body {
   width:80%;
   margin: 15px 15px 15px 15px;
 }
+
 
 
 /*Footer*/
@@ -189,4 +191,8 @@ html, body {
 
 .left{
   float:left;
+}
+
+.delButton{
+  vertical-align: middle;
 }

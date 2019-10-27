@@ -1,6 +1,8 @@
 <div id="news">
     <div class="greyBox" ng-repeat="item in newsArray">
-        <h1>{{$index+1}}. {{item.title}}</h1>
+        <h1>{{$index+1}}. {{item.title}}
+            <span class="right"><button class="delButton" ng-click="deleteNews($index);">X</button></span>
+        </h1>
         <p>{{item.content}}</p>  
         <p class="postfooter">
             <span class="left">{{item.author}}</span><span class="right">{{item.tags}}</span>

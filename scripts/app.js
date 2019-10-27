@@ -1,19 +1,39 @@
 var app = angular.module("topApp", ["ngRoute"]);
 
 
-// FACTORY -- This holds all the common data and functions (typically you should have 1 factory definition for each service)
+// FACTORY -- This service holds the main array and the functions that operate on it
+// Also holds the AJAX<->server functions
 app.factory("newsFactory", function($http)
 {
     var newsContent = {};
 
     // instantiates an array for holding news items, and defines a function to add content to it
     newsContent.arr = [];
-    newsContent.add = function(newItem)
-    {
-        newsContent.arr.push(newItem);
-    }
 
-    // load news items from server (which gets it from mongoDB database)
+    // instantiates an array for holding FAQ items
+    newsContent.faqArr = [];
+
+
+    // AJAX - GET faqs from server (which gets it from faqs.json file) and save them in the factory faq array
+    newsContent.loadFaqs = function()  
+    {
+        $http({
+            method: "GET",
+            url: "/getfaqs"
+        }).then(function onSuccess(response)
+        {
+            console.log("Load initial faq items");
+            var raw_data = angular.fromJson(response.data.arr)
+            raw_data.forEach((item) => newsContent.faqArr.push(item));
+        }, function onError(error)
+        {
+            console.log(error);
+        });
+    };
+
+
+    // AJAX - GET news items from server (which gets it from mongoDB database) and save them in the factory news array
+    // this only runs once on each page refresh; it doesn't rerun when switching tabs
     newsContent.load = function()  
     {
         $http({
@@ -30,13 +50,16 @@ app.factory("newsFactory", function($http)
         });
     };  
 
-    // send data to server (which sends it on to the MongoDB database)
-    newsContent.addToDefault = function(newItem)  
+
+    // AJAX - POST data to server (which sends it on to the MongoDB database)
+    // this also adds the news item to the factory news array
+    // this runs whenever you create a post and click "POST"
+    newsContent.add = function(newsItem)
     {
         $http({
             method: "POST",
             url: "/writenews",
-            data : newItem,
+            data : newsItem,
             headers: {'Content-Type': 'application/json'}
         }).then(function onSuccess(response)
         {
@@ -45,27 +68,31 @@ app.factory("newsFactory", function($http)
         {
             console.log(error);
         });
-    };
+        newsContent.arr.push(newsItem);
+    }
 
-    // instantiates an array for holding FAQ items, and defines a function to add content to it
-    newsContent.faqArr = [];
 
-    // load faqs from server (which gets it from faqs.json file)
-    newsContent.loadFaqs = function()  
+    // AJAX - sends DELETE data request to server (which sends it on to the MongoDB database)
+    // this also deletes(splices) the news item from the factory news array
+    // this runs whenever you click on the little "X" next to a news post
+    newsContent.delete = function(index)
     {
+        var id = newsContent.arr[index];
         $http({
-            method: "GET",
-            url: "/getfaqs"
+            method: "DELETE",
+            url: "/deletenews",
+            data : id,
+            headers: {'Content-Type': 'application/json'}
         }).then(function onSuccess(response)
         {
-            console.log("Load initial faq items");
-            var raw_data = angular.fromJson(response.data.arr)
-            raw_data.forEach((item) => newsContent.faqArr.push(item));
+            console.log("Deleted item from mongoDB database");
         }, function onError(error)
         {
             console.log(error);
         });
-    };
+        newsContent.arr.splice(index,1);
+    }
+
 
     return newsContent;
 });
@@ -109,8 +136,12 @@ app.controller("navbarController",function($scope, $location)
 app.controller("newsCtrl",['$scope','newsFactory',function($scope, newsFactory)
 { 
     // Binds the locally scoped newsArray variable to the Factory array
-    // This allows ng-repeat in the html to loop through the factory array
+    // This allows ng-repeat in the html to loop through the factory array to display each news item
     $scope.newsArray = newsFactory.arr;
+    $scope.deleteNews = function(index)
+    {   
+        newsFactory.delete(index);
+    }; 
 }]);
 
 //CONTROLLER --  Create Template Controller (links Create methods to the Factory methods)
@@ -120,7 +151,6 @@ app.controller("createCtrl",['$scope','newsFactory',function($scope, newsFactory
     {   
         var data = {"title": $scope.title,"author": $scope.author,"content": $scope.content,"tags": $scope.tags};
         newsFactory.add(data);
-        newsFactory.addToDefault(data);
         $scope.title = "";
         $scope.author = "";
         $scope.content = "";
@@ -142,7 +172,6 @@ app.controller("faqCtrl",['$scope','newsFactory',function($scope, newsFactory)
 { 
     $scope.faqArray = newsFactory.faqArr;
     $scope.faqHeader = "FAQs - Frequently Asked Questions";
-    $scope.faqContents = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. ";
 }]);
 
 //CONTROLLER --  Login Template Controller (links Login content to the Factory data)
