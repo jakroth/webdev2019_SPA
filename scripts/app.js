@@ -5,19 +5,15 @@ var app = angular.module("topApp", ["ngRoute"]);
 app.factory("newsFactory", function($http)
 {
     var newsContent = {};
-    
-    // instantiates some variables for tracking news and navbar items
-    newsContent.newsCounter = 0;
 
     // instantiates an array for holding news items, and defines a function to add content to it
     newsContent.arr = [];
     newsContent.add = function(newItem)
     {
         newsContent.arr.push(newItem);
-        newsContent.newsCounter++;
     }
 
-    // load data from server (which gets it from default_news.json file)
+    // load news items from server (which gets it from mongoDB database)
     newsContent.load = function()  
     {
         $http({
@@ -25,8 +21,8 @@ app.factory("newsFactory", function($http)
             url: "/getnews"
         }).then(function onSuccess(response)
         {
-            console.log("Load initial news items");
-            var raw_data = angular.fromJson(response.data.arr)
+            console.log("Load news items");
+            var raw_data = angular.fromJson(response.data);  
             raw_data.forEach((item) => newsContent.arr.push(item));
         }, function onError(error)
         {
@@ -34,17 +30,17 @@ app.factory("newsFactory", function($http)
         });
     };  
 
-    // send data to sever, so it can be added to default_news.json file
+    // send data to server (which sends it on to the MongoDB database)
     newsContent.addToDefault = function(newItem)  
     {
         $http({
             method: "POST",
             url: "/writenews",
-            data : angular.toJson(newItem),
+            data : newItem,
             headers: {'Content-Type': 'application/json'}
         }).then(function onSuccess(response)
         {
-            console.log("Added item to default_news.json");
+            console.log("Added item to mongoDB database");
         }, function onError(error)
         {
             console.log(error);
@@ -53,10 +49,6 @@ app.factory("newsFactory", function($http)
 
     // instantiates an array for holding FAQ items, and defines a function to add content to it
     newsContent.faqArr = [];
-    newsContent.addFaq = function(newItem)
-    {
-        newsContent.faqArr.push(newItem);
-    }
 
     // load faqs from server (which gets it from faqs.json file)
     newsContent.loadFaqs = function()  
@@ -119,7 +111,6 @@ app.controller("newsCtrl",['$scope','newsFactory',function($scope, newsFactory)
     // Binds the locally scoped newsArray variable to the Factory array
     // This allows ng-repeat in the html to loop through the factory array
     $scope.newsArray = newsFactory.arr;
-    $scope.counter = newsFactory.newsCounter;
 }]);
 
 //CONTROLLER --  Create Template Controller (links Create methods to the Factory methods)
