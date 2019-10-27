@@ -4,19 +4,43 @@ Express - the express server framework, handles POST and GET commands.
 FS - file system module. Allows for direct disk writing
 path - Allows for handling of common directory structure
 bodyparser - Handles object conversion of incoming data, converting JSON to JavaScript objects. 
+mongdb - All connecting to a remote MongoDB server
 */
 var express = require('express');
 var fs = require('fs');
-var path = require('path');
-var bodyParser = require('body-parser')
+//var path = require('path');  // Don't use these, DELETE
+//var bodyParser = require('body-parser'); // Don't use these, DELETE
+const MongoClient = require('mongodb').MongoClient;
+
 
 /*
-The "database" files. In a proper implementation this would not be used.
+Content files
 Note - require does NOT dynamically update. It calls once at the start of operation. Dynamic updates would
 require a new operation
+dn - pre-saved news items
+faq - pre-saved faq items
 */
-var dn = require('./default_news.json');
+//var dn = require('./default_news.json');  -- don't need this anymore, DELETE
 var faq = require('./faqs.json');
+
+
+/*
+The MongoDB database connection. 
+*/
+MongoClient.connect("mongodb+srv://Mutator:9u9jXTp43eSQ8mHc@unidev-gnlpy.gcp.mongodb.net/test?retryWrites=true&w=majority", function(err, client) {
+    if (err) throw err
+
+    var db = client.db('webDB')
+});
+
+
+/*
+Initial CRUD operations
+
+
+*/
+
+
 
 /*
 Instance our express environment by calling its constructor and assinging to a variable
@@ -34,7 +58,6 @@ app.use(express.static("./"));
 app.use(express.json());   
 
 
-
 /*
 Sets an AJAX route for root operation. When root route is accessed the index.html page is served. This way our index would not need to be in the root location
 it just happens that in this instance it is.
@@ -43,6 +66,7 @@ Note that in an express environment routes control our server side access. Provi
 app.get("/", function(req, res) {
     res.sendFile("./index.html"); //index.html file of your angularjs application
 });
+
 
 /*
 Sets an AJAX GET route for the /getnews route. This is the route called by Angular when using the $http service in the url (e.g. localhost:3000/getnews)
@@ -53,13 +77,19 @@ app.get("/getnews", function(req, res) {
     res.send(dn);
 });
 
+
 /*
 Sets an AJAX GET route for the /getfaqs route. This is the route called by Angular when using the $http service in the url (e.g. localhost:3000/getfaqs)
 It returns the faqs.json contents to the request
 */
 app.get("/getfaqs", function(req, res) {
     //getJSON
-    res.send(faq);
+    db.collection('news').find().toArray(function (err, result) {
+        if (err) throw err
+        console.log(result)
+    })
+
+    res.send(result);
 });
 
 
