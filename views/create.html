@@ -1,4 +1,4 @@
-<div id="create">
+<div id="create" ng-show="loggedin">
     <p>Post Title</p>
     <input type="text" name="posttitle" placeholder="Post Title" ng-model="title"/><br />
     
@@ -13,4 +13,8 @@
     <input type="text" name="posttags" placeholder="Tags, separated by commas..." ng-model="tags"/><br />
     
     <button class="postButton" ng-click="postNews()">Post</button><br /><br />
+</div>
+
+<div ng-hide="loggedin">
+    <h3>You must <a href="/#!/login">login</a> to post news content.</h3>
 </div>

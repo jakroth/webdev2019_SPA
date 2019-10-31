@@ -1,3 +1,18 @@
-<div id="login">
-    For login modal
+<div id="login" ng-hide="loggedin">
+    <h2>Login</h2>
+    <p>Username:</p>
+    <input type="text" name="username" placeholder="username" ng-model="username"/><br />
+    
+    <p>Password:</p>
+    <input type="text" name="password" placeholder="password" ng-model="password"/><br /><br />
+       
+    <button class="loginButton" ng-click="login()">Login</button><br /><br />
+</div>
+<div id="login" ng-show="loggedin">
+  <h2>Profile</h2>
+  <p>Username: User</p>
+  <p>Name: Joel</p>
+  <p>Lastname: Pillar-Rogers</p>
+  <br /><br />   
+  <button class="logoutButton" ng-click="logout()">Logout</button><br /><br />
 </div>

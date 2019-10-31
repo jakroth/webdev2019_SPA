@@ -67,6 +67,11 @@ html, body {
   width:80%;
   margin: 15px 15px 15px 15px;
 }
+
+.content #faq{
+  width:80%;
+  margin: 15px 15px 15px 15px;
+}
   
 .content #login{
   width:80%;
@@ -157,6 +162,46 @@ html, body {
   color: #fff;
 }
 
+
+
+
+/*Login*/
+.content #login p{
+  font-family: Arial, Helvetica, sans-serif;
+  font-size:18px;
+  font-weight: bold;
+  margin: 10px 10px 2px 0px;
+}
+
+.content #login input[type=text]{
+  font-family: Arial, Helvetica, sans-serif;
+  width:20%;
+  padding: 5px 5px 5px 5px;
+  margin: 0px 5px 5px 0px;
+}
+
+.content #login input[type=text]:focus{
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.content #login .loginButton{
+  background-color: rgba(255, 255, 255, 0.2);
+  margin: 5px 20px 20px 0px;
+  padding: 10px 15px 10px 5px;
+  font-size: 20px;
+  border-color:  coral;
+  color: coral;
+}
+
+.content #login .loginButton:hover{
+  background-color:  coral;
+  color: #fff;
+}
+
+
+
+
+/*GreyBox*/
 .content .greyBox{
   background-color: #e6e6e6;
   color:b#000;

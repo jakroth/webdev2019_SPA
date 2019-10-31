@@ -9,10 +9,9 @@ mongdb - All connecting to a remote MongoDB server
 const express = require('express');
 const fs = require('fs');
 //var path = require('path');  // Don't use these, DELETE
-const bodyParser = require('body-parser'); // Don't use these, ??
+const bodyParser = require('body-parser'); 
 const MongoClient = require('mongodb').MongoClient;
 const ObjectId = require("mongodb").ObjectId;
-
 
 /*
 This establishes the connection settings for MongoDB Atlas remote database and saves them in "client".
@@ -28,13 +27,13 @@ Note - require does NOT dynamically update. It calls once at the start of operat
 require a new operation
 faq - pre-saved faq items
 */
-var faq = require('./faqs.json');
+const faq = require('./faqs.json');
 
 
 /*
 Instance our express environment by calling its constructor and assinging to a variable
 */
-var app  = express();
+const app  = express();
 
 
 /*
@@ -56,6 +55,7 @@ var collection;
 /*
 Sets the listen port for the server. Note that in this case the server watches port 3000, NOT port 8000. 
 Also sets up the MongDB connection, so it can be used in all the CRUD operations.
+Code adapted from MongoDB website and https://www.thepolyglotdeveloper.com/2018/09/developing-restful-api-nodejs-mongodb-atlas/
 */
 app.listen(3000, function (){ 
     console.log("Listening on port 3000");
