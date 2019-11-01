@@ -8,7 +8,7 @@ app.run(function($rootScope) {
 
 // FACTORY -- This service holds the main array and the functions that operate on it
 // Also holds the AJAX<->server functions
-app.factory("newsFactory", function($http)
+app.factory("newsFactory", ['$http','$rootScope',function($http, $rootScope) 
 {
     var newsContent = {};
 
@@ -97,9 +97,26 @@ app.factory("newsFactory", function($http)
         newsContent.arr.splice(index,1);
     }
 
+    // AJAX - GET login verificatoin from server (which gets it from an sqlite database) and save them in the factory news array
+    newsContent.checkLogin = function(details)  
+    {
+        $http({
+            method: "GET",
+            url: "/checklogin",
+            params: {details}
+        }).then(function onSuccess(response)
+        {
+            console.log("Log in successful");
+            $rootScope.loggedin = 1;
+        }, function onError(error)
+        {
+            console.log(error);
+        });
+    };  
+
 
     return newsContent;
-});
+}]);
 
 //CONTROLLER -- Top Controller (just calls the function to load the initial data from default_news.json)
 app.controller("topController",['$scope','newsFactory',function($scope, newsFactory)
@@ -195,12 +212,14 @@ app.controller("loginCtrl",['$scope','$rootScope','newsFactory',function($scope,
     $rootScope.visiblepageId=4;
     $scope.login = function()
     {  
-        if($scope.username == "user" && $scope.password == "pass"){
+        var details = {"username": $scope.username,"password": $scope.password};
+        newsFactory.checkLogin(details);
+        if($rootScope.loggedin==1){
+        //if($scope.username == "user" && $scope.password == "pass"){
             var d = new Date();
             d.setTime(d.getTime() + (30*24*60*60*1000));
             var expires = "expires=" + d.toGMTString();
             document.cookie = "loggedin=yes;" + expires + ";path=/";
-            $rootScope.loggedin = 1; 
         }
         $scope.username = "";
         $scope.password = "";

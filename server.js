@@ -12,10 +12,10 @@ const fs = require('fs');
 const bodyParser = require('body-parser'); 
 const MongoClient = require('mongodb').MongoClient;
 const ObjectId = require("mongodb").ObjectId;
-
+const sqlite3 = require('sqlite3').verbose();
 /*
 This establishes the connection settings for MongoDB Atlas remote database and saves them in "client".
-Code from MongoDB website.
+code from mongodb website.
 */
 const CONNECTION_URL = "mongodb+srv://Mutator:9u9jXTp43eSQ8mHc@unidev-gnlpy.gcp.mongodb.net/test?retryWrites=true&w=majority";
 const DATABASE_NAME = "webDB";
@@ -50,12 +50,14 @@ Define some database variables to use in our CRUD operations
 */
 var database; 
 var collection;
+var db;
 
 
 /*
 Sets the listen port for the server. Note that in this case the server watches port 3000, NOT port 8000. 
 Also sets up the MongDB connection, so it can be used in all the CRUD operations.
-Code adapted from MongoDB website and https://www.thepolyglotdeveloper.com/2018/09/developing-restful-api-nodejs-mongodb-atlas/
+Mongo connect Code adapted from MongoDB website and https://www.thepolyglotdeveloper.com/2018/09/developing-restful-api-nodejs-mongodb-atlas/
+SQLite connection code adapted from https://www.sqlitetutorial.net/sqlite-nodejs/connect/.
 */
 app.listen(3000, function (){ 
     console.log("Listening on port 3000");
@@ -65,7 +67,13 @@ app.listen(3000, function (){
         }
         database = client.db(DATABASE_NAME);
         collection = database.collection("news");
-        console.log("Connected to `" + DATABASE_NAME + "`!");
+        console.log("Connected to '" + DATABASE_NAME + "'");
+    });
+    db = new sqlite3.Database('./sql/users.db', sqlite3.OPEN_READWRITE, (err) => {
+        if (err) {
+          console.error(err.message);
+        }
+        console.log("Connected to 'users.db'");
     });
 });
 
@@ -148,6 +156,31 @@ app.delete("/deletenews/", function(req, res) {
 /*
 I didn't create an Update function for news items due to time constraints. Would need a whole new editing page, probably similar to the create page. 
 */
+
+
+/*
+Sets an AJAX GET route for the /checklogin route. This is the route called by Angular when using the $http service in the url (e.g. localhost:3000/checklogin)
+It checks whether the username and password match in an sqlite database on the sever, and returns "yes" if found. 
+Code adapated from https://www.sqlitetutorial.net/sqlite-nodejs/query/.
+There is currently no validation set up!!!
+*/
+app.get("/checklogin", function(req, res) { 
+    //read
+    var sql = "SELECT username, password FROM Users WHERE username  = ?"; //AND password = ?`
+    var user = JSON.parse(req.query.details);
+    
+    db.get(sql, [user.username], function(err, row) {
+        if(err) {
+            console.error(err.message);
+            return res.sendStatus(500).send(error);
+        } 
+        if(row.password.localeCompare(user.password)==0){
+            console.log("Login successful")
+            res.send("yes");
+        }
+    });
+});
+
 
 /*
 THIS METHOD IS NO LONGER USED - kept as an example for saving and retreiving from server directory files
