@@ -188,27 +188,3 @@ app.get("/checklogin", function(req, res) {
         } 
     });
 });
-
-
-/*
-THIS METHOD IS NO LONGER USED - kept as an example for saving and retreiving from server directory files
-Method to take the POST data, add it to the json file and rewrite it.
-IMPORTANT: This is not a good way to store data, but is being used to avoid setting up database management. 
-
-function handlePost(req, res){
-    var data = fs.readFileSync('./default_news.json');
-    var json = JSON.parse(data);
-    var nd = req.body;
-    console.log("Request Object...");
-    console.log(req.body);
-    json.arr.push(nd)
-    console.log("Rebuild...");
-    console.log(json);
-    dn = json;
-    fs.writeFile('./default_news.json', JSON.stringify(json), (err) => {
-        if (err) throw err;
-        console.log("New JSON saved");
-    });
-}
-
-*/
