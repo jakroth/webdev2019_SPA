@@ -319,7 +319,6 @@ app.factory("cookies", function($rootScope)
     }
 
 
-
     cookieContent.createCookies = function (){
         var d = new Date();
         d.setTime(d.getTime() + (30*24*60*60*1000));  // set cookie to expire in 30 days (if not deleted)
