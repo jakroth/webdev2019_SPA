@@ -1,122 +1,19 @@
 var app = angular.module("topApp", ["ngRoute"]);
 
+
 // FUNCTION to inititate global/root variables, also check if the user is logged in using cookies
-app.run(function($rootScope) {
-    $rootScope.loggedin = checkCookie();
-    $rootScope.visiblepageId = 0;
-  });
-
-// FACTORY -- This service holds the main array and the functions that operate on it
-// Also holds the AJAX<->server functions
-app.factory("newsFactory", ['$http','$rootScope',function($http, $rootScope) 
-{
-    var newsContent = {};
-
-    // instantiates an array for holding news items, and defines a function to add content to it
-    newsContent.arr = [];
-
-    // instantiates an array for holding FAQ items
-    newsContent.faqArr = [];
-
-    // AJAX - GET faqs from server (which gets it from faqs.json file) and save them in the factory faq array
-    newsContent.loadFaqs = function()  
-    {
-        $http({
-            method: "GET",
-            url: "/getfaqs"
-        }).then(function onSuccess(response)
-        {
-            console.log("Load initial faq items");
-            var raw_data = angular.fromJson(response.data.arr)
-            raw_data.forEach((item) => newsContent.faqArr.push(item));
-        }, function onError(error)
-        {
-            console.log(error);
-        });
-    };
-
-
-    // AJAX - GET news items from server (which gets it from mongoDB database) and save them in the factory news array
-    // this only runs once on each page refresh; it doesn't rerun when switching tabs
-    newsContent.load = function()  
-    {
-        $http({
-            method: "GET",
-            url: "/getnews"
-        }).then(function onSuccess(response)
-        {
-            console.log("Load news items");
-            var raw_data = angular.fromJson(response.data);  
-            raw_data.forEach((item) => newsContent.arr.push(item));
-        }, function onError(error)
-        {
-            console.log(error);
-        });
-    };  
-
-
-    // AJAX - POST data to server (which sends it on to the MongoDB database)
-    // this also adds the news item to the factory news array
-    // this runs whenever you create a post and click "POST"
-    newsContent.add = function(newsItem)
-    {
-        $http({
-            method: "POST",
-            url: "/writenews",
-            data : newsItem,
-            headers: {'Content-Type': 'application/json'}
-        }).then(function onSuccess(response)
-        {
-            console.log("Added item to mongoDB database");
-        }, function onError(error)
-        {
-            console.log(error);
-        });
-        newsContent.arr.push(newsItem);
-    }
-
-
-    // AJAX - sends DELETE data request to server (which sends it on to the MongoDB database)
-    // this also deletes(splices) the news item from the factory news array
-    // this runs whenever you click on the little "X" next to a news post
-    newsContent.delete = function(index)
-    {
-        var id = newsContent.arr[index];
-        $http({
-            method: "DELETE",
-            url: "/deletenews",
-            data : id,
-            headers: {'Content-Type': 'application/json'}
-        }).then(function onSuccess(response)
-        {
-            console.log("Deleted item from mongoDB database");
-        }, function onError(error)
-        {
-            console.log(error);
-        });
-        newsContent.arr.splice(index,1);
-    }
-
-    // AJAX - GET login verificatoin from server (which gets it from an sqlite database) and save them in the factory news array
-    newsContent.checkLogin = function(details)  
-    {
-        $http({
-            method: "GET",
-            url: "/checklogin",
-            params: {details}
-        }).then(function onSuccess(response)
-        {
-            console.log("Log in successful");
-            $rootScope.loggedin = 1;
-        }, function onError(error)
-        {
-            console.log(error);
-        });
-    };  
-
-
-    return newsContent;
+app.run(['$rootScope','cookies',function($rootScope, cookies) {
+    $rootScope.visiblepageId = 0; // sets initial menu highlight to "News", unless another page is directly loaded
+    $rootScope.userDetails={"username": "","title": "", "fname": "", "lname": "", "email": ""};
+    $rootScope.loggedin = cookies.checkCookie(); // checks if user is logged in
+    if($rootScope.loggedin == 1) cookies.getDetails(); // obtains user details
 }]);
+
+
+
+
+//--------CONTROLLERS--------------------------
+
 
 //CONTROLLER -- Top Controller (just calls the function to load the initial data from default_news.json)
 app.controller("topController",['$scope','newsFactory',function($scope, newsFactory)
@@ -129,10 +26,8 @@ app.controller("topController",['$scope','newsFactory',function($scope, newsFact
 //CONTROLLER --  NavBar Controller (used to control inclusion of website content using ngRouting)
 app.controller("navbarController",['$scope','$location','$rootScope',function($scope, $location, $rootScope)
 { 
-    //$scope.visiblePageId = 0;
     $scope.showPage = function(pageId)
     {
-        //$scope.visiblePageId = pageId;
         switch (pageId) {
             case 0:
                 $location.path("/")
@@ -191,7 +86,7 @@ app.controller("createCtrl",['$scope','$rootScope','newsFactory',function($scope
 
 
 //CONTROLLER --  About Controller (provides content for some local scope variables and links to Factory data)
-app.controller("aboutCtrl",['$scope','$rootScope','newsFactory',function($scope, $rootScope, newsFactory)
+app.controller("aboutCtrl",['$scope','$rootScope',function($scope, $rootScope)
 { 
     $rootScope.visiblepageId=2;
     $scope.aboutHeader = "About";
@@ -207,27 +102,25 @@ app.controller("faqCtrl",['$scope','$rootScope','newsFactory',function($scope, $
 }]);
 
 //CONTROLLER --  Login Controller (links Login content to the Factory data)
-app.controller("loginCtrl",['$scope','$rootScope','newsFactory',function($scope, $rootScope, newsFactory)
+app.controller("loginCtrl",['$scope','$rootScope','newsFactory','cookies',function($scope,$rootScope,newsFactory,cookies)
 { 
     $rootScope.visiblepageId=4;
+
+    // Login function
     $scope.login = function()
     {  
         var details = {"username": $scope.username,"password": $scope.password};
         newsFactory.checkLogin(details);
-        if($rootScope.loggedin==1){
-        //if($scope.username == "user" && $scope.password == "pass"){
-            var d = new Date();
-            d.setTime(d.getTime() + (30*24*60*60*1000));
-            var expires = "expires=" + d.toGMTString();
-            document.cookie = "loggedin=yes;" + expires + ";path=/";
-        }
         $scope.username = "";
         $scope.password = "";
     }; 
+    // Logout function
     $scope.logout = function()
     {   
-        document.cookie = "loggedin=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/"; // deletes the cookie by setting an expiry date in the past
+        console.log("Log out successful")
+        cookies.deleteCookies();
         $rootScope.loggedin = 0;
+        $rootScope.userDetails = {}; // clear temporary storage
     }; 
 }]);
 
@@ -274,26 +167,191 @@ function getTime(){
 
 
 
-// COOKIE FUNCTIONS - adapted from https://www.w3schools.com/js/js_cookies.asp
 
-  function getCookie(cname) {
+// ---------FACTORIES---------
+
+
+// NEWSFACTORY -- This service holds the main arrays and  functions that operate on them
+// Also holds the AJAX<->server functions
+app.factory("newsFactory", ['$http','$rootScope','cookies',function($http,$rootScope,cookies) 
+{
+    var newsContent = {};
+
+    // instantiates an array for holding news items, and defines a function to add content to it
+    newsContent.arr = [];
+
+    // instantiates an array for holding FAQ items
+    newsContent.faqArr = [];
+
+    // AJAX - GET faqs from server (which gets it from faqs.json file) and save them in the factory faq array
+    newsContent.loadFaqs = function()  
+    {
+        $http({
+            method: "GET",
+            url: "/getfaqs"
+        }).then(function onSuccess(response)
+        {
+            console.log("Load initial faq items");
+            var raw_data = angular.fromJson(response.data.arr)
+            raw_data.forEach((item) => newsContent.faqArr.push(item));
+        }, function onError(error)
+        {
+            console.log(error);
+        });
+    };
+
+
+    // AJAX - GET news items from server (which gets it from mongoDB database) and save them in the factory news array
+    // this only runs once on each page refresh; it doesn't rerun when switching tabs
+    newsContent.load = function()  
+    {
+        $http({
+            method: "GET",
+            url: "/getnews"
+        }).then(function onSuccess(response)
+        {
+            console.log("Load initial news items");
+            var raw_data = angular.fromJson(response.data);  
+            raw_data.forEach((item) => newsContent.arr.push(item));
+        }, function onError(error)
+        {
+            console.log(error);
+        });
+    };  
+
+
+    // AJAX - POST data to server (which sends it on to the MongoDB database)
+    // this also adds the news item to the factory news array
+    // this runs whenever you create a post and click "POST"
+    newsContent.add = function(newsItem)
+    {
+        $http({
+            method: "POST",
+            url: "/writenews",
+            data : newsItem,
+            headers: {'Content-Type': 'application/json'}
+        }).then(function onSuccess(response)
+        {
+            console.log("Created news item");
+        }, function onError(error)
+        {
+            console.log(error);
+        });
+        newsContent.arr.push(newsItem);
+    }
+
+
+    // AJAX - sends DELETE data request to server (which sends it on to the MongoDB database)
+    // this also deletes(splices) the news item from the factory news array
+    // this runs whenever you click on the little "X" next to a news post
+    newsContent.delete = function(index)
+    {
+        var id = newsContent.arr[index];
+        $http({
+            method: "DELETE",
+            url: "/deletenews",
+            data : id,
+            headers: {'Content-Type': 'application/json'}
+        }).then(function onSuccess(response)
+        {
+            console.log("Deleted news item");
+        }, function onError(error)
+        {
+            console.log(error);
+        });
+        newsContent.arr.splice(index,1); //removes this element from the array
+    }
+
+    // AJAX - GET login verificatoin from server (which gets it from an sqlite database) and save them in the factory news array
+    newsContent.checkLogin = function(details)  
+    {
+        $http({
+            method: "GET",
+            url: "/checklogin",
+            params: details
+        }).then(function onSuccess(response)
+        {
+            console.log("Log in successful");
+            $rootScope.loggedin = 1;
+            $rootScope.userDetails = response.data;
+            cookies.createCookies();
+
+        }, function onError(error)
+        {
+            console.log(error);
+        });
+    };  
+
+    return newsContent;
+}]);
+
+
+
+
+
+// COOKIE FACTORY - adapted from https://www.w3schools.com/js/js_cookies.asp
+// These functions are stored in the "cookie" service, which needs to be injected into local controllers if used
+app.factory("cookies", function($rootScope) 
+{
+    var cookieContent = {};
+
+    cookieContent.getCookie = function (cname) {
     var name = cname + "=";
     var decodedCookie = decodeURIComponent(document.cookie);
     var ca = decodedCookie.split(';');
     for(var i = 0; i < ca.length; i++) {
-      var c = ca[i];
-      while (c.charAt(0) == ' ') {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
         c = c.substring(1);
-      }
-      if (c.indexOf(name) == 0) {
+        }
+        if (c.indexOf(name) == 0) {
         return c.substring(name.length, c.length);
-      }
+        }
     }
     return "";
-  }
+    }
   
-  function checkCookie() { 
-    var loggedin=getCookie("loggedin");
+
+    cookieContent.checkCookie = function () { 
+    var loggedin=cookieContent.getCookie("loggedin");
     if (loggedin == "yes") return 1; 
     else return 0;
-  }
+    }
+
+
+
+    cookieContent.createCookies = function (){
+        var d = new Date();
+        d.setTime(d.getTime() + (30*24*60*60*1000));  // set cookie to expire in 30 days (if not deleted)
+        var expires = "expires=" + d.toGMTString();
+        document.cookie = "loggedin=yes;" + expires + ";path=/";
+        document.cookie = "user=" + $rootScope.userDetails.username + ";" + expires + ";path=/";
+        document.cookie = "title=" + $rootScope.userDetails.title + ";" + expires + ";path=/";
+        document.cookie = "fname=" + $rootScope.userDetails.fname + ";" + expires + ";path=/";
+        document.cookie = "lname=" + $rootScope.userDetails.lname + ";" + expires + ";path=/";
+        document.cookie = "email=" + $rootScope.userDetails.email + ";" + expires + ";path=/";
+        console.log("created cookie: " + document.cookie);
+    }
+
+
+    cookieContent.deleteCookies = function (){
+        document.cookie = "loggedin=no;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/";
+        document.cookie = "user='';expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/";
+        document.cookie = "title='';expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/";
+        document.cookie = "fname='';expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/";
+        document.cookie = "lname='';expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/";
+        document.cookie = "email='';expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/";
+        console.log("deleted cookie");
+    }
+
+
+    cookieContent.getDetails = function () { 
+        $rootScope.userDetails.username = cookieContent.getCookie("user");
+        $rootScope.userDetails.title = cookieContent.getCookie("title"); 
+        $rootScope.userDetails.fname = cookieContent.getCookie("fname"); 
+        $rootScope.userDetails.lname = cookieContent.getCookie("lname"); 
+        $rootScope.userDetails.email = cookieContent.getCookie("email"); 
+    }
+
+    return cookieContent;
+});

@@ -97,6 +97,8 @@ It returns the faqs.json content from the local server directory.
 app.get("/getfaqs", function(req, res) {
     //getJSON
     res.send(faq);
+    console.log("Retrieved FAQs from server file 'faqs.json'")
+
 });
 
 
@@ -113,6 +115,7 @@ app.get("/getnews", function(req, res) {
         if(err) {
             return response.status(500).send(error);
         }
+        console.log("Retrieved News items from MongoDB")
         res.send(result);
     });
 });
@@ -130,6 +133,7 @@ app.post("/writenews", function(req, res) {
         if(err) {
             return res.status(500).send(error);
         } 
+        console.log("Added news item to MongoDB")
         res.send(result.result);
     });
 
@@ -149,6 +153,7 @@ app.delete("/deletenews/", function(req, res) {
         if(err) {
             return res.status(500).send(error);
         } 
+        console.log("Deleted news item from MongoDB")
         res.send(result.result);
     });
 });
@@ -166,18 +171,21 @@ There is currently no validation set up!!!
 */
 app.get("/checklogin", function(req, res) { 
     //read
-    var sql = "SELECT username, password FROM Users WHERE username  = ?"; //AND password = ?`
-    var user = JSON.parse(req.query.details);
+    var sql = "SELECT * FROM Users WHERE username  = ?"; //AND password = ?`
     
-    db.get(sql, [user.username], function(err, row) {
+    db.get(sql, [req.query.username], function(err, row) {
         if(err) {
             console.error(err.message);
             return res.sendStatus(500).send(error);
         } 
-        if(row.password.localeCompare(user.password)==0){
-            console.log("Login successful")
-            res.send("yes");
+        if(row.password.localeCompare(req.query.password)==0){
+            console.log("Login successful - validated against server's sqlite database 'users.db'")
+            var data = {"username": row.username,"title": row.title, "fname": row.fName, "lname": row.lName, "email": row.email};
+            res.send(data);
         }
+        else {
+            return res.sendStatus(500).send("Incorrect password");
+        } 
     });
 });
 

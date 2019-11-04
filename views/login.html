@@ -10,9 +10,11 @@
 </div>
 <div id="login" ng-show="loggedin">
   <h2>Profile</h2>
-  <p>Username: User</p>
-  <p>Name: Joel</p>
-  <p>Lastname: Pillar-Rogers</p>
+  <p>Username: {{userDetails.username}}</p>
+  <p>Title: {{userDetails.title}}</p>
+  <p>Name: {{userDetails.fname}}</p>
+  <p>Surname: {{userDetails.lname}}</p>
+  <p>Email: {{userDetails.email}}</p>
   <br /><br />   
   <button class="logoutButton" ng-click="logout()">Logout</button><br /><br />
 </div>
