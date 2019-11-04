@@ -27,7 +27,7 @@ Note - require does NOT dynamically update. It calls once at the start of operat
 require a new operation
 faq - pre-saved faq items
 */
-const faq = require('./faqs.json');
+const faq = require('./json/faqs.json');
 
 
 /*
