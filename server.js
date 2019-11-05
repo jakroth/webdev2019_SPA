@@ -101,7 +101,6 @@ app.get("/getfaqs", function(req, res) {
     //getJSON
     res.send(faq);
     console.log("Retrieved FAQs from server file 'faqs.json'")
-
 });
 
 

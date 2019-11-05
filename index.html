@@ -17,7 +17,7 @@
 <!--This page calls all the content of the SPA using ng-include and ng-view-->
 <!--Some controllers are included by default, other controllers are called when the associated view is called through ng-route in app.js-->
 
-<body ng-App="topApp" ng-controller="topController">
+<body ng-App="bodyApp" ng-controller="bodyController">
     <div id="page-container">
       <div id="content-wrap">
   
@@ -27,7 +27,7 @@
         <div class="navbar" ng-include="'views/navbar.html'" ng-controller="navbarController">
         </div>
   
-        <!-- this is where the changing content will be displayed. All other content is essentially static-->
+        <!-- this is where the dynamic content will be displayed. All other content is essentially static. -->
         <div class="content" ng-view>
         </div>
         

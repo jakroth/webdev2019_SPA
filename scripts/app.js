@@ -1,7 +1,7 @@
 // ----------------INITIAL FUNCTIONS and CONFIGURATION----------------------------
 
 // Defines variable app as an Angular module and inserts the ngRoute service. 
-var app = angular.module("topApp", ["ngRoute"]);
+var app = angular.module("bodyApp", ["ngRoute"]);
 
 
 // FUNCTION to initiate global/root variables, also check if the user is logged in using cookies
@@ -22,8 +22,6 @@ app.config(function($routeProvider)
     .when("/about",             { templateUrl: "views/about.html",  controller: "aboutCtrl"  })
     .when("/faq",               { templateUrl: "views/faq.html",    controller: "faqCtrl"  })
     .when("/login",             { templateUrl: "views/login.html",  controller: "loginCtrl"  })
-    .when("/profile",           { templateUrl: "views/profile.html",  controller: "profileCtrl"  })
-    .when("/register",          { templateUrl: "views/register.html",  controller: "registerCtrl"  })
     .otherwise(                 { template: "<h1>404 error</h1>"})
 });
 
@@ -42,11 +40,10 @@ function getTime(){
 
 
 //CONTROLLER -- Top Controller (calls the functions to load the initial data from MongoDB and faqs.json)
-app.controller("topController",['$scope','newsFactory',function($scope, newsFactory)
+app.controller("bodyController",['$scope','newsFactory',function($scope, newsFactory)
 { 
     newsFactory.load();
     newsFactory.loadFaqs();
-
 }]);
 
 //CONTROLLER --  NavBar Controller (used to control inclusion of website content using ngRouting)
@@ -69,12 +66,6 @@ app.controller("navbarController",['$scope','$location',function($scope, $locati
                 break
             case 4:
                 $location.path("/login")
-                break
-            case 5:
-                $location.path("/profile")
-                 break
-            case 6:
-                $location.path("/register")
                 break
         }
     };
@@ -131,7 +122,7 @@ app.controller("faqCtrl",['$scope','$rootScope','newsFactory',function($scope, $
     $scope.faqHeader = "FAQs - Frequently Asked Questions";
 }]);
 
-//CONTROLLER --  Login Controller (provides the functionality for the login page by linking to the function in the Factory service)
+//CONTROLLER --  Login Controller (provides the functionality for the login page by linking to function in the newsFactory and cookies services)
 app.controller("loginCtrl",['$scope','$rootScope','newsFactory','cookies',function($scope,$rootScope,newsFactory,cookies)
 { 
     // Specificies which NavBar button to highlight when this controller is called
@@ -249,11 +240,9 @@ app.factory("newsFactory", ['$http','$rootScope','cookies',function($http,$rootS
             url: "/deletenews",
             data : id,
             headers: {'Content-Type': 'application/json'}
-        }).then(function onSuccess(response)
-        {
+        }).then(function onSuccess(response){
             console.log("Deleted news item");
-        }, function onError(error)
-        {
+        }, function onError(error){
             console.log(error);
         });
         newsContent.arr.splice(index,1); //removes this element from the array
@@ -266,15 +255,13 @@ app.factory("newsFactory", ['$http','$rootScope','cookies',function($http,$rootS
             method: "GET",
             url: "/checklogin",
             params: details
-        }).then(function onSuccess(response)
-        {
+        }).then(function onSuccess(response) {
             console.log("Log in successful");
             $rootScope.loggedin = 1;
             $rootScope.userDetails = response.data;
             cookies.createCookies();
-
-        }, function onError(error)
-        {
+            
+        }, function onError(error) {
             console.log(error);
         });
     };  
