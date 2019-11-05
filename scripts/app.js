@@ -1,21 +1,47 @@
+// ----------------INITIAL FUNCTIONS and CONFIGURATION----------------------------
+
+// Defines variable app as an Angular module and inserts the ngRoute service. 
 var app = angular.module("topApp", ["ngRoute"]);
 
 
-// FUNCTION to inititate global/root variables, also check if the user is logged in using cookies
+// FUNCTION to initiate global/root variables, also check if the user is logged in using cookies
 app.run(['$rootScope','cookies',function($rootScope, cookies) {
     $rootScope.visiblepageId = 0; // sets initial menu highlight to "News", unless another page is directly loaded
     $rootScope.userDetails={"username": "","title": "", "fname": "", "lname": "", "email": ""};
     $rootScope.loggedin = cookies.checkCookie(); // checks if user is logged in
-    if($rootScope.loggedin == 1) cookies.getDetails(); // obtains user details
+    if($rootScope.loggedin == 1) cookies.getUserDetails(); // obtains user details
 }]);
 
 
+//CONFIG --  Configures the ngRouting of the app
+app.config(function($routeProvider)
+{
+    $routeProvider
+    .when("/",                  { templateUrl: "views/news.html",   controller: "newsCtrl" })
+    .when("/create",            { templateUrl: "views/create.html", controller: "createCtrl"  })
+    .when("/about",             { templateUrl: "views/about.html",  controller: "aboutCtrl"  })
+    .when("/faq",               { templateUrl: "views/faq.html",    controller: "faqCtrl"  })
+    .when("/login",             { templateUrl: "views/login.html",  controller: "loginCtrl"  })
+    .when("/profile",           { templateUrl: "views/profile.html",  controller: "profileCtrl"  })
+    .when("/register",          { templateUrl: "views/register.html",  controller: "registerCtrl"  })
+    .otherwise(                 { template: "<h1>404 error</h1>"})
+});
 
 
-//--------CONTROLLERS--------------------------
+//FUNCTION -- Defines a function for obtaining the current date and time
+function getTime(){
+    var today = new Date();
+    var minutes = today.getMinutes()<10 ? "0" + today.getMinutes() : today.getMinutes();
+    var timestamp = today.getHours() + ":" + minutes  + " - " + today.getDate() + "/" + (today.getMonth()+1) + "/" + today.getFullYear(); 
+    return timestamp;
+};
 
 
-//CONTROLLER -- Top Controller (just calls the function to load the initial data from default_news.json)
+
+//-----------------------CONTROLLERS--------------------------
+
+
+//CONTROLLER -- Top Controller (calls the functions to load the initial data from MongoDB and faqs.json)
 app.controller("topController",['$scope','newsFactory',function($scope, newsFactory)
 { 
     newsFactory.load();
@@ -24,7 +50,7 @@ app.controller("topController",['$scope','newsFactory',function($scope, newsFact
 }]);
 
 //CONTROLLER --  NavBar Controller (used to control inclusion of website content using ngRouting)
-app.controller("navbarController",['$scope','$location','$rootScope',function($scope, $location, $rootScope)
+app.controller("navbarController",['$scope','$location',function($scope, $location)
 { 
     $scope.showPage = function(pageId)
     {
@@ -57,6 +83,7 @@ app.controller("navbarController",['$scope','$location','$rootScope',function($s
 //CONTROLLER --  News Template Controller (links News content to the Factory data)
 app.controller("newsCtrl",['$scope','$rootScope','newsFactory',function($scope, $rootScope, newsFactory)
 { 
+    // Specificies which NavBar button to highlight when this controller is called
     $rootScope.visiblepageId=0;
     // Binds the locally scoped newsArray variable to the Factory array
     // This allows ng-repeat in the html to loop through the factory array to display each news item
@@ -71,6 +98,7 @@ app.controller("newsCtrl",['$scope','$rootScope','newsFactory',function($scope, 
 //CONTROLLER --  Create Template Controller (links Create methods to the Factory methods)
 app.controller("createCtrl",['$scope','$rootScope','newsFactory',function($scope, $rootScope, newsFactory)
 { 
+    // Specificies which NavBar button to highlight when this controller is called
     $rootScope.visiblepageId=1;
     $scope.postNews = function()
     {   
@@ -85,28 +113,31 @@ app.controller("createCtrl",['$scope','$rootScope','newsFactory',function($scope
 }]);
 
 
-//CONTROLLER --  About Controller (provides content for some local scope variables and links to Factory data)
+//CONTROLLER --  About Controller (provides content for the About view)
 app.controller("aboutCtrl",['$scope','$rootScope',function($scope, $rootScope)
 { 
+    // Specificies which NavBar button to highlight when this controller is called
     $rootScope.visiblepageId=2;
     $scope.aboutHeader = "About";
     $scope.aboutContent = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec ullamcorper neque eu quam viverra euismod. Nulla id libero vel orci porta laoreet et nec enim. Vestibulum eget mi sed urna porttitor blandit non eu tortor. Nunc metus est, placerat at risus eget, fermentum pretium odio. Proin ornare non elit id mattis. Curabitur eget finibus ligula. Ut ullamcorper sollicitudin est, id efficitur urna hendrerit nec. Vivamus a maximus lectus.<br /> Integer mi lacus, aliquam nec facilisis eu, eleifend placerat orci. Proin arcu quam, blandit in tortor ac, aliquam vehicula tellus. Praesent justo massa, posuere in feugiat et, laoreet quis turpis. Mauris quis velit pharetra, pharetra leo non, vehicula lectus. Morbi malesuada tellus ullamcorper felis condimentum pretium. In vulputate erat vitae egestas blandit. Donec ullamcorper varius mi vel interdum. Suspendisse hendrerit posuere aliquet. Vestibulum rutrum dapibus ultrices. Vestibulum semper lectus leo, at ultrices odio gravida ac. Vestibulum placerat odio nec placerat imperdiet. Sed nulla quam, viverra at ornare et, posuere fringilla nisi. Etiam pretium augue eros, sed posuere purus vehicula non. Donec et dolor a erat scelerisque auctor. Vestibulum at nibh lorem.<br />Aliquam suscipit lacus sed aliquet bibendum. Pellentesque vel neque sagittis, venenatis nisi ac, placerat augue. In ullamcorper, dui nec porttitor placerat, metus lacus gravida nibh, id sollicitudin diam ex in augue. Nulla bibendum ante ut turpis ultricies semper. Quisque ac malesuada libero. Etiam mattis sed nisi vitae vestibulum. Donec molestie posuere massa, in sollicitudin erat sagittis sit amet. Maecenas ante mauris, dapibus id tellus a, pellentesque tempus velit. Vestibulum semper odio aliquet orci lobortis scelerisque. Vestibulum vulputate finibus libero non sollicitudin. Morbi varius massa eu efficitur rutrum. Duis nisi ligula, sodales id diam at, porttitor elementum velit. Aliquam tempor a urna ac vehicula.";
 }]);
 
-//CONTROLLER --  FAQ Controller (provides content for some local scope variables and links to Factory data)
+//CONTROLLER --  FAQ Controller (provides content for some local scope variables and links to the FAQ array in the Factory service)
 app.controller("faqCtrl",['$scope','$rootScope','newsFactory',function($scope, $rootScope, newsFactory)
 { 
+    // Specificies which NavBar button to highlight when this controller is called
     $rootScope.visiblepageId=3;
     $scope.faqArray = newsFactory.faqArr;
     $scope.faqHeader = "FAQs - Frequently Asked Questions";
 }]);
 
-//CONTROLLER --  Login Controller (links Login content to the Factory data)
+//CONTROLLER --  Login Controller (provides the functionality for the login page by linking to the function in the Factory service)
 app.controller("loginCtrl",['$scope','$rootScope','newsFactory','cookies',function($scope,$rootScope,newsFactory,cookies)
 { 
+    // Specificies which NavBar button to highlight when this controller is called
     $rootScope.visiblepageId=4;
 
-    // Login function
+    // Log-in function
     $scope.login = function()
     {  
         var details = {"username": $scope.username,"password": $scope.password};
@@ -114,7 +145,7 @@ app.controller("loginCtrl",['$scope','$rootScope','newsFactory','cookies',functi
         $scope.username = "";
         $scope.password = "";
     }; 
-    // Logout function
+    // Log-out function
     $scope.logout = function()
     {   
         console.log("Log out successful")
@@ -124,55 +155,21 @@ app.controller("loginCtrl",['$scope','$rootScope','newsFactory','cookies',functi
     }; 
 }]);
 
-//CONTROLLER --  Register Controller (links Register content to the Factory data)
-app.controller("registerCtrl",['$scope','newsFactory',function($scope, newsFactory)
-{ 
-}]);
 
-//CONTROLLER --  Profile Controller (links Profile content to the Factory data)
-app.controller("profileCtrl",['$scope','newsFactory',function($scope, newsFactory)
-{ 
-}]);
-
-
-//CONTROLLER --  Footer Controller (links Footer time data to the Factory time)
-app.controller("footerController",['$scope','newsFactory',function($scope, newsFactory)
+//CONTROLLER --  Footer Controller (links Footer time data to the getTime function)
+app.controller("footerController",function($scope)
 { 
     $scope.dateTime = getTime();
-}]);
-
-
-//CONFIG --  Configures the ngRouting of the app
-app.config(function($routeProvider)
-{
-    $routeProvider
-    .when("/",                  { templateUrl: "views/news.html",   controller: "newsCtrl" })
-    .when("/create",            { templateUrl: "views/create.html", controller: "createCtrl"  })
-    .when("/about",             { templateUrl: "views/about.html",  controller: "aboutCtrl"  })
-    .when("/faq",               { templateUrl: "views/faq.html",    controller: "faqCtrl"  })
-    .when("/login",             { templateUrl: "views/login.html",  controller: "loginCtrl"  })
-    .when("/profile",           { templateUrl: "views/profile.html",  controller: "profileCtrl"  })
-    .when("/register",          { templateUrl: "views/register.html",  controller: "registerCtrl"  })
-    .otherwise(                 { template: "<h1>404 error</h1>"})
 });
 
-//FUNCTION -- Defines a function for obtaining the current date and time
-function getTime(){
-    var today = new Date();
-    var minutes = today.getMinutes()<10 ? "0" + today.getMinutes() : today.getMinutes();
-    var timestamp = today.getHours() + ":" + minutes  + " - " + today.getDate() + "/" + (today.getMonth()+1) + "/" + today.getFullYear(); 
-    return timestamp;
-};
 
 
 
+// ---------------------SERVICES / FACTORIES---------------------
 
 
-// ---------FACTORIES---------
-
-
-// NEWSFACTORY -- This service holds the main arrays and  functions that operate on them
-// Also holds the AJAX<->server functions
+// NEWSFACTORY -- This service holds the main arrays and functions that operate on them
+// Also holds the AJAX HTTP<->server functions
 app.factory("newsFactory", ['$http','$rootScope','cookies',function($http,$rootScope,cookies) 
 {
     var newsContent = {};
@@ -262,7 +259,7 @@ app.factory("newsFactory", ['$http','$rootScope','cookies',function($http,$rootS
         newsContent.arr.splice(index,1); //removes this element from the array
     }
 
-    // AJAX - GET login verificatoin from server (which gets it from an sqlite database) and save them in the factory news array
+    // AJAX - GET login verification from server (which gets it from an sqlite database), changes user status to logged-in and saves the user's details in $rootScope.userDetails
     newsContent.checkLogin = function(details)  
     {
         $http({
@@ -287,14 +284,13 @@ app.factory("newsFactory", ['$http','$rootScope','cookies',function($http,$rootS
 
 
 
-
-
 // COOKIE FACTORY - adapted from https://www.w3schools.com/js/js_cookies.asp
-// These functions are stored in the "cookie" service, which needs to be injected into local controllers if used
+// These functions are stored in the "cookie" service, which needs to be injected into local controllers to use
 app.factory("cookies", function($rootScope) 
 {
     var cookieContent = {};
 
+    // Gets the value of a cookie 
     cookieContent.getCookie = function (cname) {
     var name = cname + "=";
     var decodedCookie = decodeURIComponent(document.cookie);
@@ -311,14 +307,14 @@ app.factory("cookies", function($rootScope)
     return "";
     }
   
-
+    // Checks if the "loggedin" cookie is yes or no
     cookieContent.checkCookie = function () { 
     var loggedin=cookieContent.getCookie("loggedin");
     if (loggedin == "yes") return 1; 
     else return 0;
     }
 
-
+    // Creates a cookie from $rootScope.userDetails and specifies loggedin=yes
     cookieContent.createCookies = function (){
         var d = new Date();
         d.setTime(d.getTime() + (30*24*60*60*1000));  // set cookie to expire in 30 days (if not deleted)
@@ -332,7 +328,7 @@ app.factory("cookies", function($rootScope)
         console.log("created cookie: " + document.cookie);
     }
 
-
+    // Deletes all cookies associated with localhost:3000 by setting the expiry date in the past
     cookieContent.deleteCookies = function (){
         document.cookie = "loggedin=no;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/";
         document.cookie = "user='';expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/";
@@ -343,8 +339,8 @@ app.factory("cookies", function($rootScope)
         console.log("deleted cookie");
     }
 
-
-    cookieContent.getDetails = function () { 
+    // Gets user details from the cookies and inserts them into $rootScope.userDetails
+    cookieContent.getUserDetails = function () { 
         $rootScope.userDetails.username = cookieContent.getCookie("user");
         $rootScope.userDetails.title = cookieContent.getCookie("title"); 
         $rootScope.userDetails.fname = cookieContent.getCookie("fname"); 
@@ -352,5 +348,6 @@ app.factory("cookies", function($rootScope)
         $rootScope.userDetails.email = cookieContent.getCookie("email"); 
     }
 
+    // ALWAYS remember to have a return statement in a service!!!
     return cookieContent;
 });

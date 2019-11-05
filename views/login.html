@@ -1,3 +1,4 @@
+<!-- If the user is NOT logged in, they will see the login page-->
 <div id="login" ng-hide="loggedin">
     <h2>Login</h2>
     <p>Username:</p>
@@ -8,6 +9,8 @@
        
     <button class="loginButton" ng-click="login()">Login</button><br /><br />
 </div>
+
+<!-- If the user IS logged in, they will see the profile page, with the details stored in $rootScope.userDetails-->
 <div id="login" ng-show="loggedin">
   <h2>Profile</h2>
   <p>Username: {{userDetails.username}}</p>
