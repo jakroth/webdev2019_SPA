@@ -13,6 +13,7 @@ title 					CHAR(4),
 fName 					CHAR(20),
 lName 					CHAR(20),
 email		 			CHAR(20),
+userType					CHAR(20),
 PRIMARY KEY (UserID)
 );
 
